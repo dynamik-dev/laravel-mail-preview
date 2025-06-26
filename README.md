@@ -1,4 +1,4 @@
-# Laravel Mail Preview
+![Laravel Mail Preview](./laravel-mail-preview.png)
 
 A utility for viewing emails in your browser as you develop with Laravel. This package allows you to preview your mailables without actually sending emails, making it easier to develop and test your email templates.
 
@@ -14,6 +14,54 @@ A utility for viewing emails in your browser as you develop with Laravel. This p
 
 - PHP 8.4+
 - Laravel 10.x, 11.x, or 12.x
+
+## How to use
+
+### 1. Make Your Mailable Previewable
+
+To make a mailable previewable, implement the `Previewable` interface and add the `toPreview()` method:
+
+```php
+class WelcomeEmail extends Mailable implements Previewable
+{
+    public static function toPreview(): self
+    {
+        return new self(
+            User::factory(['name' => 'Chris Arter'])->make()
+        );
+    }
+}
+```
+
+### 2. View Your Email Preview
+
+Once you've made your mailable previewable, you can view it in your browser at:
+
+```
+http://your-app.test/mail/welcome-email
+```
+
+The URL slug is automatically generated from your class name:
+- `WelcomeEmail` → `welcome-email`
+- `OrderConfirmationMail` → `order-confirmation-mail`
+- `TestMailable` → `test-mailable`
+
+
+
+### 3. Custom Preview Slugs
+
+You can also define a custom preview slug by adding a static property to your mailable:
+
+```php
+class WelcomeEmail extends Mailable implements Previewable
+{
+    public static string $previewSlug = 'welcome';
+    
+    // ... rest of your mailable code
+}
+```
+
+Now you can access it at: `http://your-app.test/mail/welcome`
 
 ## Installation
 
@@ -50,115 +98,14 @@ return [
 
 ### Environment Variables
 
-Add these to your `.env` file:
+To enable the mail preview, set `MAIL_PREVIEW_ENABLED` to `true` in your `.env` file.
+
+These are the available options:
 
 ```env
 MAIL_PREVIEW_ENABLED=true
 MAIL_PREVIEW_ROUTE_PREFIX=mail
 MAIL_PREVIEW_DISCOVER_PATH=/path/to/your/app
-```
-
-## Usage
-
-### 1. Make Your Mailable Previewable
-
-To make a mailable previewable, implement the `Previewable` interface and add the `toPreview()` method:
-
-```php
-<?php
-
-namespace App\Mail;
-
-use Illuminate\Mail\Mailable;
-use DynamikDev\MailPreview\Contracts\Previewable;
-use Illuminate\Mail\Mailables\Envelope;
-use Illuminate\Mail\Mailables\Content;
-use Illuminate\Mail\Mailables\Address;
-
-class WelcomeEmail extends Mailable implements Previewable
-{
-    public function __construct(public string $name)
-    {
-    }
-
-    public function envelope(): Envelope
-    {
-        return new Envelope(
-            subject: 'Welcome to Our Platform',
-            from: new Address('welcome@example.com', 'Our Team'),
-        );
-    }
-
-    public function content(): Content
-    {
-        return new Content(
-            htmlString: view('emails.welcome', ['name' => $this->name])->render(),
-        );
-    }
-
-    /**
-     * Create a preview instance of this mailable
-     */
-    public static function toPreview(): self
-    {
-        return new self('John Doe');
-    }
-}
-```
-
-### 2. View Your Email Preview
-
-Once you've made your mailable previewable, you can view it in your browser at:
-
-```
-http://your-app.test/mail/welcome-email
-```
-
-The URL slug is automatically generated from your class name:
-- `WelcomeEmail` → `welcome-email`
-- `OrderConfirmationMail` → `order-confirmation-mail`
-- `TestMailable` → `test-mailable`
-
-### 3. Custom Preview Slugs
-
-You can also define a custom preview slug by adding a static property to your mailable:
-
-```php
-class WelcomeEmail extends Mailable implements Previewable
-{
-    public static string $previewSlug = 'welcome';
-    
-    // ... rest of your mailable code
-}
-```
-
-Now you can access it at: `http://your-app.test/mail/welcome`
-
-## Advanced Usage
-
-### Using the Facade
-
-You can also use the `MailPreview` facade to programmatically render mailables:
-
-```php
-use DynamikDev\MailPreview\Facades\MailPreview;
-
-// Render a mailable by slug
-$html = MailPreview::render('welcome-email');
-
-// Get all previewable classes
-$classes = MailPreview::getPreviewableClasses();
-```
-
-### Custom Discovery Paths
-
-You can configure multiple discovery paths by modifying the config:
-
-```php
-'discover_path' => [
-    base_path('app/Mail'),
-    base_path('app/Notifications'),
-],
 ```
 
 ## Security
@@ -185,7 +132,7 @@ Please see [CONTRIBUTING.md](CONTRIBUTING.md) for details.
 
 ## Credits
 
-- [Chris Arter](https://github.com/chrisarter)
+- [Chris Arter](https://github.com/christopherarter)
 - [All Contributors](../../contributors)
 
 ## License
