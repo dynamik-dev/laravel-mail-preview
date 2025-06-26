@@ -1,12 +1,12 @@
 <?php
 
-namespace VendorName\Skeleton\Commands;
+namespace DynamikDev\MailPreview\Commands;
 
 use Illuminate\Console\Command;
 
-class SkeletonCommand extends Command
+class MailPreviewCommand extends Command
 {
-    public $signature = 'skeleton';
+    public $signature = 'laravel-mail-preview';
 
     public $description = 'My command';
 

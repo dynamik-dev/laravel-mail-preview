@@ -15,9 +15,15 @@
     cacheDirectory=".phpunit.cache"
     backupStaticProperties="false"
 >
+    <php>
+        <env name="APP_ENV" value="testing"/>
+        <env name="MAIL_PREVIEW_DISCOVER_PATH" value="tests/Fixtures"/>
+        <env name="MAIL_PREVIEW_ROUTE_PREFIX" value="custom-mail-preview"/>
+    </php>
     <testsuites>
-        <testsuite name="VendorName Test Suite">
+        <testsuite name="DynamikDev Test Suite">
             <directory>tests</directory>
+
         </testsuite>
     </testsuites>
     <logging>

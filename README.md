@@ -1,91 +1,191 @@
-# :package_description
+# Laravel Mail Preview
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/:vendor_slug/:package_slug.svg?style=flat-square)](https://packagist.org/packages/:vendor_slug/:package_slug)
-[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/:vendor_slug/:package_slug/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/:vendor_slug/:package_slug/actions?query=workflow%3Arun-tests+branch%3Amain)
-[![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/:vendor_slug/:package_slug/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/:vendor_slug/:package_slug/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
-[![Total Downloads](https://img.shields.io/packagist/dt/:vendor_slug/:package_slug.svg?style=flat-square)](https://packagist.org/packages/:vendor_slug/:package_slug)
-<!--delete-->
----
-This repo can be used to scaffold a Laravel package. Follow these steps to get started:
+A utility for viewing emails in your browser as you develop with Laravel. This package allows you to preview your mailables without actually sending emails, making it easier to develop and test your email templates.
 
-1. Press the "Use this template" button at the top of this repo to create a new repo with the contents of this skeleton.
-2. Run "php ./configure.php" to run a script that will replace all placeholders throughout all the files.
-3. Have fun creating your package.
-4. If you need help creating a package, consider picking up our <a href="https://laravelpackage.training">Laravel Package Training</a> video course.
----
-<!--/delete-->
-This is where your description should go. Limit it to a paragraph or two. Consider adding a small example.
+## Features
 
-## Support us
+- 🔍 **Auto-discovery** of mailables that implement the `Previewable` interface
+- 🌐 **Web-based preview** - view emails directly in your browser
+- 🎨 **Template testing** - test your email templates with sample data
+- ⚡ **Development-friendly** - only enabled in development environments
+- 🔧 **Configurable** - customize discovery paths and route prefixes
 
-[<img src="https://github-ads.s3.eu-central-1.amazonaws.com/:package_name.jpg?t=1" width="419px" />](https://spatie.be/github-ad-click/:package_name)
+## Requirements
 
-We invest a lot of resources into creating [best in class open source packages](https://spatie.be/open-source). You can support us by [buying one of our paid products](https://spatie.be/open-source/support-us).
-
-We highly appreciate you sending us a postcard from your hometown, mentioning which of our package(s) you are using. You'll find our address on [our contact page](https://spatie.be/about-us). We publish all received postcards on [our virtual postcard wall](https://spatie.be/open-source/postcards).
+- PHP 8.4+
+- Laravel 10.x, 11.x, or 12.x
 
 ## Installation
 
-You can install the package via composer:
+You can install the package via Composer:
 
 ```bash
-composer require :vendor_slug/:package_slug
+composer require dynamik-dev/laravel-mail-preview --dev
 ```
 
-You can publish and run the migrations with:
+The package will automatically register itself with Laravel.
+
+## Configuration
+
+Publish the configuration file:
 
 ```bash
-php artisan vendor:publish --tag=":package_slug-migrations"
-php artisan migrate
+php artisan vendor:publish --provider="DynamikDev\MailPreview\MailPreviewServiceProvider"
 ```
 
-You can publish the config file with:
-
-```bash
-php artisan vendor:publish --tag=":package_slug-config"
-```
-
-This is the contents of the published config file:
+This will create a `config/mail-preview.php` file with the following options:
 
 ```php
 return [
+    // Enable or disable the mail preview
+    'enabled' => env('MAIL_PREVIEW_ENABLED', false),
+    
+    // The route prefix for the mail preview
+    'route_prefix' => env('MAIL_PREVIEW_ROUTE_PREFIX', 'mail'),
+    
+    // The path to discover mailables in
+    'discover_path' => env('MAIL_PREVIEW_DISCOVER_PATH', base_path('app')),
 ];
 ```
 
-Optionally, you can publish the views using
+### Environment Variables
 
-```bash
-php artisan vendor:publish --tag=":package_slug-views"
+Add these to your `.env` file:
+
+```env
+MAIL_PREVIEW_ENABLED=true
+MAIL_PREVIEW_ROUTE_PREFIX=mail
+MAIL_PREVIEW_DISCOVER_PATH=/path/to/your/app
 ```
 
 ## Usage
 
+### 1. Make Your Mailable Previewable
+
+To make a mailable previewable, implement the `Previewable` interface and add the `toPreview()` method:
+
 ```php
-$variable = new VendorName\Skeleton();
-echo $variable->echoPhrase('Hello, VendorName!');
+<?php
+
+namespace App\Mail;
+
+use Illuminate\Mail\Mailable;
+use DynamikDev\MailPreview\Contracts\Previewable;
+use Illuminate\Mail\Mailables\Envelope;
+use Illuminate\Mail\Mailables\Content;
+use Illuminate\Mail\Mailables\Address;
+
+class WelcomeEmail extends Mailable implements Previewable
+{
+    public function __construct(public string $name)
+    {
+    }
+
+    public function envelope(): Envelope
+    {
+        return new Envelope(
+            subject: 'Welcome to Our Platform',
+            from: new Address('welcome@example.com', 'Our Team'),
+        );
+    }
+
+    public function content(): Content
+    {
+        return new Content(
+            htmlString: view('emails.welcome', ['name' => $this->name])->render(),
+        );
+    }
+
+    /**
+     * Create a preview instance of this mailable
+     */
+    public static function toPreview(): self
+    {
+        return new self('John Doe');
+    }
+}
 ```
 
+### 2. View Your Email Preview
+
+Once you've made your mailable previewable, you can view it in your browser at:
+
+```
+http://your-app.test/mail/welcome-email
+```
+
+The URL slug is automatically generated from your class name:
+- `WelcomeEmail` → `welcome-email`
+- `OrderConfirmationMail` → `order-confirmation-mail`
+- `TestMailable` → `test-mailable`
+
+### 3. Custom Preview Slugs
+
+You can also define a custom preview slug by adding a static property to your mailable:
+
+```php
+class WelcomeEmail extends Mailable implements Previewable
+{
+    public static string $previewSlug = 'welcome';
+    
+    // ... rest of your mailable code
+}
+```
+
+Now you can access it at: `http://your-app.test/mail/welcome`
+
+## Advanced Usage
+
+### Using the Facade
+
+You can also use the `MailPreview` facade to programmatically render mailables:
+
+```php
+use DynamikDev\MailPreview\Facades\MailPreview;
+
+// Render a mailable by slug
+$html = MailPreview::render('welcome-email');
+
+// Get all previewable classes
+$classes = MailPreview::getPreviewableClasses();
+```
+
+### Custom Discovery Paths
+
+You can configure multiple discovery paths by modifying the config:
+
+```php
+'discover_path' => [
+    base_path('app/Mail'),
+    base_path('app/Notifications'),
+],
+```
+
+## Security
+
+**Important**: This package should only be enabled in development environments. The mail preview routes expose your email templates and could potentially leak sensitive information.
+
+Make sure to:
+
+1. Set `MAIL_PREVIEW_ENABLED=false` in production
+2. Add the preview routes to your middleware if needed
+3. Consider using authentication middleware for the preview routes
+
 ## Testing
+
+Run the test suite:
 
 ```bash
 composer test
 ```
 
-## Changelog
-
-Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed recently.
-
 ## Contributing
 
-Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
-
-## Security Vulnerabilities
-
-Please review [our security policy](../../security/policy) on how to report security vulnerabilities.
+Please see [CONTRIBUTING.md](CONTRIBUTING.md) for details.
 
 ## Credits
 
-- [:author_name](https://github.com/:author_username)
+- [Chris Arter](https://github.com/chrisarter)
 - [All Contributors](../../contributors)
 
 ## License
