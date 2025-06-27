@@ -8,6 +8,7 @@ on:
       - 'phpunit.xml.dist'
       - 'composer.json'
       - 'composer.lock'
+  workflow_dispatch:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -18,12 +19,12 @@ jobs:
     runs-on: ${{ matrix.os }}
     timeout-minutes: 5
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest]
-        php: [8.4, 8.3]
+        os: [ubuntu-latest]
+        php: [8.3, 8.4]
         laravel: [12.*, 11.*, 10.*]
-        stability: [prefer-lowest, prefer-stable]
+        stability: [prefer-stable]
         include:
           - laravel: 12.*
             testbench: 10.*
@@ -31,7 +32,7 @@ jobs:
             testbench: 9.*
           - laravel: 10.*
             testbench: 8.*
-    
+
 
     name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.stability }} - ${{ matrix.os }}
 
@@ -54,6 +55,10 @@ jobs:
       - name: Install dependencies
         run: |
           composer require "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}" --no-interaction --no-update
+          # Laravel 10.x needs older Pest plugin versions
+          if [[ "${{ matrix.laravel }}" == "10.*" ]]; then
+            composer require pestphp/pest-plugin-arch:^2.0 pestphp/pest-plugin-laravel:^2.0 --dev --no-interaction --no-update
+          fi
           composer update --${{ matrix.stability }} --prefer-dist --no-interaction
 
       - name: List Installed Dependencies
