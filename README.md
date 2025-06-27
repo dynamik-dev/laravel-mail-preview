@@ -1,5 +1,11 @@
 ![Laravel Mail Preview](./laravel-mail-preview.png)
 
+[![Tests](https://github.com/dynamik-dev/laravel-mail-preview/actions/workflows/run-tests.yml/badge.svg)](https://github.com/dynamik-dev/laravel-mail-preview/actions/workflows/run-tests.yml)
+[![PHPStan](https://img.shields.io/badge/PHPStan-level%205-brightgreen.svg)](https://phpstan.org/)
+<a href="https://buymeacoffee.com/chrisarter">
+    <img src="https://raw.githubusercontent.com/pachadotdev/buymeacoffee-badges/main/bmc-yellow.svg" alt="BuyMeACoffee">
+  </a>
+  
 A utility for viewing emails in your browser as you develop with Laravel. This package allows you to preview your mailables without actually sending emails, making it easier to develop and test your email templates.
 
 ```php
