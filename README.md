@@ -2,18 +2,39 @@
 
 A utility for viewing emails in your browser as you develop with Laravel. This package allows you to preview your mailables without actually sending emails, making it easier to develop and test your email templates.
 
-## Features
+```php
+// Make any mailable previewable
+class WelcomeEmail extends Mailable implements Previewable
+{
+    public static function toPreview(): self
+    {
+        return new self(User::factory()->make());
+    }
+}
+```
+Then, view it instantly at 👀 `http://your-app.test/mail/welcome-email`
 
-- 🔍 **Auto-discovery** of mailables that implement the `Previewable` interface
-- 🌐 **Web-based preview** - view emails directly in your browser
-- 🎨 **Template testing** - test your email templates with sample data
-- ⚡ **Development-friendly** - only enabled in development environments
-- 🔧 **Configurable** - customize discovery paths and route prefixes
 
-## Requirements
+## Table of Contents
 
-- PHP 8.4+
-- Laravel 10.x, 11.x, or 12.x
+- [How to use](#how-to-use)
+  - [1. Make Your Mailable Previewable](#1-make-your-mailable-previewable)
+  - [2. View Your Email Preview](#2-view-your-email-preview)
+  - [3. Custom Preview Slugs](#3-custom-preview-slugs)
+- [Installation](#installation)
+- [Requirements](#requirements)
+- [Configuration](#configuration)
+  - [Environment Variables](#environment-variables)
+- [Security](#security)
+- [Testing](#testing)
+- [Contributing](#contributing)
+- [Credits](#credits)
+- [License](#license)
+
+
+
+
+**Think of it like Factories for your emails.**
 
 ## How to use
 
@@ -72,6 +93,11 @@ composer require dynamik-dev/laravel-mail-preview --dev
 ```
 
 The package will automatically register itself with Laravel.
+
+## Requirements
+
+- PHP 8.4+
+- Laravel 10.x, 11.x, or 12.x
 
 ## Configuration
 
