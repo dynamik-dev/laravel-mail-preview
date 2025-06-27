@@ -57,6 +57,10 @@ jobs:
           composer require "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}" --no-interaction --no-update
           composer update --${{ matrix.stability }} --prefer-dist --no-interaction
 
+      - name: Adjust Pest plugin for Laravel 10
+        if: matrix.laravel == '10.*'
+        run: composer require pestphp/pest-plugin-arch:^2.0 --dev --no-interaction
+
       - name: List Installed Dependencies
         run: composer show -D
 
