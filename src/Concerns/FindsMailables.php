@@ -31,7 +31,6 @@ trait FindsMailables
 
             $classSlug = Str::kebab(class_basename($class));
 
-
             /**
              * @var string|null $previewSlug
              */
