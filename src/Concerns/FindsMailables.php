@@ -18,7 +18,7 @@ trait FindsMailables
     {
         $discoverPath = config('mail-preview.discover_path');
 
-        return new Collection(Discover::in($discoverPath)->implementing(Previewable::class)->get())->values();
+        return (new Collection(Discover::in($discoverPath))->implementing(Previewable::class)->get())->values();
     }
 
     /**
