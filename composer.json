@@ -1,6 +1,5 @@
 {
     "name": "dynamik-dev/laravel-mail-preview",
-    "version": "0.1.0",
     "description": "A utility for viewing emails in your browser as you develop.",
     "keywords": [
         "DynamikDev",
