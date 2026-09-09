@@ -1,5 +1,13 @@
 <?php
 
+it('can render a list of mailables', function () {
+    $response = $this->get(route('mail-preview.list'));
+
+    $response->assertOk();
+    $response->assertSee('test-mailable');
+    $response->assertSee(route('mail-preview.show', ['slug' => 'test-mailable']), false);
+});
+
 it('can render a mailable', function () {
     $response = $this->get(route('mail-preview.show', 'test-mailable'));
 

@@ -5,6 +5,8 @@ on:
     paths:
       - '**.php'
       - 'phpstan.neon.dist'
+      - 'phpstan-baseline.neon'
+      - 'testbench.yaml'
       - '.github/workflows/phpstan.yml'
 
 jobs:

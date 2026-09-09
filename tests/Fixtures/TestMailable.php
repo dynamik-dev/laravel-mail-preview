@@ -10,7 +10,7 @@ use Illuminate\Mail\Mailables\Envelope;
 
 class TestMailable extends Mailable implements Previewable
 {
-    public function __construct(public string $name) {}
+    final public function __construct(public string $name) {}
 
     public function envelope(): Envelope
     {
@@ -27,8 +27,8 @@ class TestMailable extends Mailable implements Previewable
         );
     }
 
-    public static function toPreview(): self
+    public static function toPreview(): static
     {
-        return new self('Batman');
+        return new static('Batman');
     }
 }

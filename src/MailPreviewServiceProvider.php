@@ -17,6 +17,7 @@ class MailPreviewServiceProvider extends PackageServiceProvider
         $package
             ->name('laravel-mail-preview')
             ->hasConfigFile()
+            ->hasViews()
             ->hasRoute('mail-preview');
     }
 }
