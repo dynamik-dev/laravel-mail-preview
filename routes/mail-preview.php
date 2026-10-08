@@ -3,6 +3,10 @@
 use DynamikDev\MailPreview\Controllers\MailPreviewController;
 use Illuminate\Support\Facades\Route;
 
+if (! config('mail-preview.enabled')) {
+    return;
+}
+
 $prefix = config('mail-preview.route_prefix');
 
 if (! is_string($prefix)) {
