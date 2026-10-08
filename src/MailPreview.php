@@ -4,7 +4,7 @@ namespace DynamikDev\MailPreview;
 
 use DynamikDev\MailPreview\Attributes\PreviewableTitle;
 use DynamikDev\MailPreview\Concerns\FindsMailables;
-use DynamikDev\MailPreview\Contracts\Previewable;
+use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Support\Str;
 use ReflectionClass;
 
@@ -12,15 +12,17 @@ class MailPreview
 {
     use FindsMailables;
 
-    public function render(string $slug): ?Previewable
+    public function render(string $slug): ?Renderable
     {
         $class = $this->findBySlug($slug);
 
-        if ($class === null || ! is_subclass_of($class, Previewable::class)) {
+        if ($class === null || ! is_callable([$class, 'toPreview'])) {
             return null;
         }
 
-        return $class::toPreview();
+        $preview = call_user_func([$class, 'toPreview']);
+
+        return $preview instanceof Renderable ? $preview : null;
     }
 
     /**

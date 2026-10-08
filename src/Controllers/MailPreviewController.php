@@ -2,8 +2,8 @@
 
 namespace DynamikDev\MailPreview\Controllers;
 
-use DynamikDev\MailPreview\Contracts\Previewable;
 use DynamikDev\MailPreview\MailPreview;
+use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Routing\Controller;
 use Illuminate\View\View;
 
@@ -13,7 +13,7 @@ class MailPreviewController extends Controller
         protected MailPreview $mailPreview
     ) {}
 
-    public function show(string $slug): ?Previewable
+    public function show(string $slug): ?Renderable
     {
         return $this->mailPreview->render($slug);
     }

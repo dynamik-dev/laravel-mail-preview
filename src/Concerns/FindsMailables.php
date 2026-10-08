@@ -2,16 +2,18 @@
 
 namespace DynamikDev\MailPreview\Concerns;
 
+use DynamikDev\MailPreview\Attributes\Previewable as PreviewableAttribute;
 use DynamikDev\MailPreview\Contracts\Previewable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Spatie\StructureDiscoverer\Discover;
+use Spatie\StructureDiscoverer\Support\Conditions\ConditionBuilder;
 
 trait FindsMailables
 {
     /**
-     * Get all classes that implement the Previewable interface
+     * Get all classes marked with the Previewable attribute or implementing the Previewable interface
      *
      * @return Collection<int, string>
      */
@@ -23,7 +25,12 @@ trait FindsMailables
             throw new InvalidArgumentException('The [mail-preview.discover_path] config value must be a string.');
         }
 
-        $structures = Discover::in($discoverPath)->implementing(Previewable::class)->get();
+        $structures = Discover::in($discoverPath)
+            ->any(
+                ConditionBuilder::create()->withAttribute(PreviewableAttribute::class),
+                ConditionBuilder::create()->implementing(Previewable::class),
+            )
+            ->get();
 
         return collect(array_values(array_filter($structures, 'is_string')));
     }
