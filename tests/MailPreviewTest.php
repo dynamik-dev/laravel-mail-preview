@@ -10,6 +10,21 @@ it('can render a list of mailables', function () {
     $response->assertSee(route('mail-preview.show', ['slug' => 'test-mailable']), false);
 });
 
+it('uses the previewable title attribute on the listing page', function () {
+    $response = $this->get(route('mail-preview.list'));
+
+    $response->assertOk();
+    $response->assertSee('Welcome to the Batcave');
+    $response->assertDontSee('>test-titled-mailable<', false);
+    $response->assertSee(route('mail-preview.show', ['slug' => 'test-titled-mailable']), false);
+});
+
+it('falls back to the slug when there is no previewable title attribute', function () {
+    $response = $this->get(route('mail-preview.list'));
+
+    $response->assertSee('>test-mailable<', false);
+});
+
 it('can render a mailable', function () {
     $response = $this->get(route('mail-preview.show', 'test-mailable'));
 
