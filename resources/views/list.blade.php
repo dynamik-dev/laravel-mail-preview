@@ -58,9 +58,9 @@
     <h1>Mail Preview</h1>
 
     <ul>
-        @forelse ($list as $slug)
+        @forelse ($list as $item)
             <li>
-                <a href="{{ route('mail-preview.show', ['slug' => $slug]) }}">{{ $slug }}</a>
+                <a href="{{ route('mail-preview.show', ['slug' => $item['slug']]) }}">{{ $item['title'] }}</a>
             </li>
         @empty
             <li><a>No previewable mailables found.</a></li>

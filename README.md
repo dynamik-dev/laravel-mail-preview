@@ -27,6 +27,7 @@ Then, view it instantly at 👀 `http://your-app.test/mail/welcome-email`
   - [1. Make Your Mailable Previewable](#1-make-your-mailable-previewable)
   - [2. View Your Email Preview](#2-view-your-email-preview)
   - [3. Custom Preview Slugs](#3-custom-preview-slugs)
+  - [4. Custom Listing Titles](#4-custom-listing-titles)
 - [Installation](#installation)
 - [Requirements](#requirements)
 - [Configuration](#configuration)
@@ -90,6 +91,22 @@ class WelcomeEmail extends Mailable implements Previewable
 
 Now you can access it at: `http://your-app.test/mail/welcome`
 
+### 4. Custom Listing Titles
+
+The listing page at `http://your-app.test/mail` shows each mailable by its slug. To show a friendlier title instead, add the `#[PreviewableTitle]` attribute:
+
+```php
+use DynamikDev\MailPreview\Attributes\PreviewableTitle;
+
+#[PreviewableTitle('Welcome Email')]
+class WelcomeEmail extends Mailable implements Previewable
+{
+    // ...
+}
+```
+
+The title is not inherited, so a subclass shows its own slug unless it has its own `#[PreviewableTitle]`.
+
 ## Installation
 
 You can install the package via Composer:
@@ -102,8 +119,8 @@ The package will automatically register itself with Laravel.
 
 ## Requirements
 
-- PHP 8.4+
-- Laravel 10.x, 11.x, or 12.x
+- PHP 8.3+
+- Laravel 10.x, 11.x, 12.x, or 13.x
 
 ## Configuration
 
