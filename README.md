@@ -10,7 +10,8 @@ A utility for viewing emails in your browser as you develop with Laravel. This p
 
 ```php
 // Make any mailable previewable
-class WelcomeEmail extends Mailable implements Previewable
+#[Previewable]
+class WelcomeEmail extends Mailable
 {
     public static function toPreview(): self
     {
@@ -46,10 +47,13 @@ Then, view it instantly at 👀 `http://your-app.test/mail/welcome-email`
 
 ### 1. Make Your Mailable Previewable
 
-To make a mailable previewable, implement the `Previewable` interface and add the `toPreview()` method:
+To make a mailable previewable, add the `#[Previewable]` attribute and a static `toPreview()` method:
 
 ```php
-class WelcomeEmail extends Mailable implements Previewable
+use DynamikDev\MailPreview\Attributes\Previewable;
+
+#[Previewable]
+class WelcomeEmail extends Mailable
 {
     public static function toPreview(): self
     {
@@ -59,6 +63,10 @@ class WelcomeEmail extends Mailable implements Previewable
     }
 }
 ```
+
+> **Why an attribute?** This package is installed with `--dev`, so it is absent when you deploy with `composer install --no-dev`. PHP ignores attributes whose class doesn't exist until they're read, so your mailable still loads and sends normally in production.
+>
+> The `DynamikDev\MailPreview\Contracts\Previewable` interface is still supported, but a class implementing it **fails to load** when the package isn't installed. Only use the interface if you install the package as a regular (non-dev) dependency.
 
 ### 2. View Your Email Preview
 
@@ -80,7 +88,8 @@ The URL slug is automatically generated from your class name:
 You can also define a custom preview slug by adding a static property to your mailable:
 
 ```php
-class WelcomeEmail extends Mailable implements Previewable
+#[Previewable]
+class WelcomeEmail extends Mailable
 {
     public static string $previewSlug = 'welcome';
     
@@ -130,7 +139,7 @@ return [
 
 ### Environment Variables
 
-To enable the mail preview, set `MAIL_PREVIEW_ENABLED` to `true` in your `.env` file.
+The preview routes are only registered when `MAIL_PREVIEW_ENABLED` is `true`. It defaults to `false`, so add it to your local `.env` file.
 
 These are the available options:
 
@@ -146,7 +155,7 @@ MAIL_PREVIEW_DISCOVER_PATH=/path/to/your/app
 
 Make sure to:
 
-1. Set `MAIL_PREVIEW_ENABLED=false` in production
+1. Leave `MAIL_PREVIEW_ENABLED` unset (or `false`) in production so the routes are never registered
 2. Add the preview routes to your middleware if needed
 3. Consider using authentication middleware for the preview routes
 
